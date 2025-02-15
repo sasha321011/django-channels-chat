@@ -13,9 +13,10 @@ services:
       - DB_USER=dbuser
       - DB_PASS=pass
     command: sh -c "python manage.py runserver 0.0.0.0:8000"
-
+      #sh -c "gunicorn --bind 0.0.0.0:8000 core.wsgi:application"
     depends_on:
       - db
+      - redis
 
   db:
     image: postgres
@@ -23,3 +24,33 @@ services:
       - POSTGRES_DB=dbname
       - POSTGRES_USER=dbuser
       - POSTGRES_PASSWORD=pass
+  redis:
+    image: redis:7.0.5-alpine
+    hostname: redis
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./frontend:/app
+    command: >
+      sh -c "npm run serve"
+    environment:
+      - NODE_ENV=development
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./backend/static:/django-channels-chat/static
+      - ./backend/media:/django-channels-chat/media
+    depends_on:
+      - app
+      - frontend
+    command: >
+      sh -c "sleep 10 && nginx -g 'daemon off;'"
+    #restart: always

@@ -1,8 +1,10 @@
 Django==4.2
-djangorestframework==3.14.0  # если используешь DRF
+djangorestframework==3.14.0
 channels==4.0.0
 channels-redis==4.1.0
-gunicorn==21.2.0  # WSGI-сервер для продакшена
+gunicorn==21.2.0
 psycopg2==2.8.6
 celery==5.3.4
 django-cors-headers==4.3.0
+gunicorn==21.2.0
+django-redis==5.2.0
