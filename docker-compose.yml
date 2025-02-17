@@ -8,17 +8,17 @@ services:
     volumes:
       - ./backend:/backend
     environment:
-      - DB_HOST=db
+      - DB_HOST=database
       - DB_NAME=dbname
       - DB_USER=dbuser
       - DB_PASS=pass
     command: sh -c "python manage.py runserver 0.0.0.0:8000"
       #sh -c "gunicorn --bind 0.0.0.0:8000 core.wsgi:application"
     depends_on:
-      - db
+      - database
       - redis
 
-  db:
+  database:
     image: postgres
     environment:
       - POSTGRES_DB=dbname

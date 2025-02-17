@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     #"debug_toolbar",
     #"django_filters",
     "rest_framework",
-
+    "accounts",
     #'cachalot',
 
     #"rest_framework.authtoken",
@@ -60,6 +60,8 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'core.urls'
 
+AUTH_USER_MODEL ="accounts.User"
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -77,6 +79,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'core.wsgi.application'
+#CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1:8000"]
 
 
 # Database

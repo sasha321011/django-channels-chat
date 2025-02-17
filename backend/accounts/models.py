@@ -3,21 +3,22 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 
 
 class UserManager(BaseUserManager):
-    def create(self,email,password=None,**extra_field):
+    def create_user(self, email, password=None, **extra_fields):
         if not email:
-            raise ValueError('USER MUST NEED EMAIL')
+            raise ValueError('The Email field must be set')
         email = self.normalize_email(email)
-        user = self.model(email=email,**extra_field)
+        user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self.db)
         return user
 
-    def create_super(self,email,password=None,**extra_field):
-        extra_field.setdefault("is_staff",True)
-        extra_field.setdefault("is_superuser", True)
-        return self.create_user(email,password=password,**extra_field)
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        return self.create_user(email, password=password, **extra_fields)
 
-class User(AbstractBaseUser):
+
+class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=255,blank=True)
     last_name = models.CharField(max_length=255,blank=True)
@@ -25,9 +26,9 @@ class User(AbstractBaseUser):
     is_staff = models.BooleanField(default=True)
     date_join = models.DateTimeField(auto_now_add=True)
 
-    object = UserManager()
+    objects = UserManager()
 
-    USERNAMEFIELD = 'email'
+    USERNAME_FIELD = 'email'
 
     def get_full_name(self):
         return f'{self.first_name} {self.last_name}'
