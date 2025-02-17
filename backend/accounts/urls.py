@@ -5,5 +5,3 @@ router = DefaultRouter()
 router.register(r"registration", Registration, basename="registration")
 
 urlpatterns = router.urls
-
-
