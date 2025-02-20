@@ -27,7 +27,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES':[
+        'accounts.tokenauthentication.JWTAuthentication',
+    ]
+}
 # Application definition
 
 INSTALLED_APPS = [
