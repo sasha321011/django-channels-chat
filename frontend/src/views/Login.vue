@@ -1,14 +1,12 @@
 <template>
   <div class="form-container">
-    <form @submit.prevent="register">
+    <form @submit.prevent="login">
       <input v-model="form.email" type="email" placeholder="Email" required />
-      <input v-model="form.first_name" type="text" placeholder="First Name" required />
-      <input v-model="form.last_name" type="text" placeholder="Last Name" required />
       <input v-model="form.password" type="password" placeholder="Password" required />
       <button type="submit">SAVE</button>
     </form>
     <p v-if="message" :class="{ success: success, error: !success }">{{ message }}</p>
-    <p>Уже есть аккаунт? <button @click="goToLogin" class="link-button">Войти</button></p>
+    <p>Нет аккаунта? <button @click="goToRegister" class="link-button">Регистрация</button></p>
   </div>
 </template>
 
@@ -20,8 +18,6 @@ export default {
     return {
       form: {
         email: '',
-        first_name: '',
-        last_name: '',
         password: ''
       },
       message: '',
@@ -29,23 +25,23 @@ export default {
     };
   },
   methods: {
-    async register() {
+    async login() {
       try {
-        const response = await axios.post('/registration/', this.form);
+        const response = await axios.post('/login/', this.form);
         if (response.status === 201 || response.status === 200) {
-          this.message = 'Registration successful!';
+          this.message = 'Login successful!';
           this.success = true;
           setTimeout(() => {
-            this.$router.push('/login');
+            this.$router.push('/');
           }, 1000);
         }
       } catch (error) {
-        this.message = error.response?.data?.message || 'Registration failed!';
+        this.message = error.response?.data?.message || 'Login failed!';
         this.success = false;
       }
     },
-    goToLogin() {
-      this.$router.push('/login');
+    goToRegister() {
+      this.$router.push('/register');
     }
   }
 };
