@@ -12,21 +12,34 @@
 
     <!-- Main content: Chat and Sidebar -->
     <div class="chat-container">
+      <!-- Sidebar -->
       <div class="sidebar">
         <div class="chatters">
-          <div class="chatter" v-for="chatter in chatters" :key="chatter.id">
-            {{ chatter.name }}
+          <div
+            class="chatter"
+            v-for="chatter in chatters"
+            :key="chatter.id"
+            @click="goToUserChat(chatter.id)"
+          >
+            {{ chatter.email }} (First name:{{ chatter.first_name }} Last name:{{ chatter.last_name }})
           </div>
         </div>
       </div>
+
+      <!-- Chat Window -->
       <div class="chat-window">
         <div class="messages">
-          <div class="message" v-for="msg in messages" :key="msg.id" :class="{'my-message': msg.sender === 'You', 'other-message': msg.sender !== 'You'}">
+          <div
+            class="message"
+            v-for="msg in messages"
+            :key="msg.id"
+            :class="{'my-message': msg.sender === 'You', 'other-message': msg.sender !== 'You'}"
+          >
             <strong>{{ msg.sender }}:</strong> {{ msg.text }}
           </div>
         </div>
         <div class="message-input">
-          <input v-model="newMessage" placeholder="Type a message..." />
+          <input v-model="newMessage" placeholder="Type a message..." @keyup.enter="sendMessage" />
           <button @click="sendMessage">Send</button>
         </div>
       </div>
@@ -35,6 +48,9 @@
 </template>
 
 <script>
+import axios from 'axios';
+import VueCookies from 'vue-cookies';
+
 export default {
   name: 'ChatWindow',
   data() {
@@ -43,29 +59,62 @@ export default {
       messages: [
         { id: 1, sender: 'John Doe', text: 'Hey, how are you?' },
         { id: 2, sender: 'Jane Smith', text: 'I am good, thanks!' },
-        { id: 3, sender: 'Bob Johnson', text: 'Hello everyone!' }
+        { id: 3, sender: 'Bob Johnson', text: 'Hello everyone!' },
       ],
-      chatters: [
-        { id: 1, name: 'John Doe' },
-        { id: 2, name: 'Jane Smith' },
-        { id: 3, name: 'Bob Johnson' }
-      ]
+      chatters: [], // Список пользователей
+      token: null,  // Токен из куки
+    };
+  },
+  async created() {
+    // Извлекаем токен из куки
+    this.token = VueCookies.get('token');
+
+    // Если токен есть, получаем список пользователей
+    if (this.token) {
+      await this.fetchChatters();
+    } else {
+      console.error('Токен отсутствует');
+      this.$router.push('/login'); // Перенаправляем на страницу входа, если токена нет
     }
   },
   methods: {
+    // Получение списка пользователей
+    async fetchChatters() {
+      try {
+        const response = await axios.get('/api/users/', {
+          headers: {
+            Authorization: `Bearer ${this.token}`, // Используем токен из куки
+          },
+        });
+        this.chatters = response.data; // Сохраняем список пользователей
+      } catch (error) {
+        console.error('Ошибка при загрузке пользователей:', error);
+        this.$router.push('/login'); // Перенаправляем на страницу входа в случае ошибки
+      }
+    },
+
+    // Отправка сообщения (заглушка)
     sendMessage() {
       if (this.newMessage.trim()) {
         const newMsg = {
-          id: this.messages.length + 1,
-          sender: 'You',
-          text: this.newMessage
-        }
-        this.messages.push(newMsg)
-        this.newMessage = ''
+          id: this.messages.length + 1, // Просто увеличиваем ID
+          sender: 'You', // Отправитель — текущий пользователь
+          text: this.newMessage, // Текст сообщения
+        };
+        this.messages.push(newMsg); // Добавляем сообщение в список
+        this.newMessage = ''; // Очищаем поле ввода
+
+        // Заглушка для WebSocket (позже замените на реальный вызов)
+        console.log('Сообщение отправлено (заглушка):', newMsg);
       }
-    }
-  }
-}
+    },
+
+    // Переход к чату с пользователем
+    goToUserChat(userId) {
+      this.$router.push(`/chat/${userId}`);
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -122,6 +171,12 @@ export default {
   margin-bottom: 10px;
   font-size: 16px;
   cursor: pointer;
+}
+
+.chatter:hover {
+  background-color: #3c4b64;
+  padding: 5px;
+  border-radius: 4px;
 }
 
 .chat-window {

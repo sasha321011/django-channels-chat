@@ -2,25 +2,53 @@
   <div class="sidebar">
     <div class="chatters">
       <div class="chatter" v-for="chatter in chatters" :key="chatter.id">
-        {{ chatter.name }}
+        {{ chatter.email }} ({{ chatter.first_name }} {{ chatter.last_name }})
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
+import VueCookies from 'vue-cookies';
+
 export default {
   name: 'Sidebar',
   data() {
     return {
-      chatters: [
-        { id: 1, name: 'John Doe' },
-        { id: 2, name: 'Jane Smith' },
-        { id: 3, name: 'Bob Johnson' }
-      ]
+      chatters: [], // Список пользователей
+      token: null,  // Токен из куки
+    };
+  },
+  async created() {
+    // Извлекаем токен из куки
+    this.token = VueCookies.get('token');
+
+    // Если токен есть, получаем список пользователей
+    if (this.token) {
+      await this.fetchChatters();
+    } else {
+      console.error('Токен отсутствует');
+      this.$router.push('/login'); // Перенаправляем на страницу входа, если токена нет
     }
-  }
-}
+  },
+  methods: {
+    // Получение списка пользователей
+    async fetchChatters() {
+      try {
+        const response = await axios.get('/api/users/', {
+          headers: {
+            Authorization: `Bearer ${this.token}`, // Используем токен из куки
+          },
+        });
+        this.chatters = response.data; // Сохраняем список пользователей
+      } catch (error) {
+        console.error('Ошибка при загрузке пользователей:', error);
+        this.$router.push('/login'); // Перенаправляем на страницу входа в случае ошибки
+      }
+    },
+  },
+};
 </script>
 
 <style scoped>

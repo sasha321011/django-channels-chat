@@ -19,7 +19,7 @@ class JWTAuthentication(BaseAuthentication):
 
             user_id = payload['id']
             user = get_user_model().objects.get(id=user_id)
-            return user
+            return (user,token)
         except (InvalidTokenError,ExpiredSignatureError,get_user_model().DoesNotExist):
             raise AuthenticationFailed('Invalid Token')
 

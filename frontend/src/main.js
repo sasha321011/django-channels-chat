@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
 import axios from 'axios';
 
-axios.defaults.baseURL = 'http://localhost:8000/api'; // URL бекенда
+axios.defaults.baseURL = 'http://localhost:8000/'; // URL бекенда
 
 const app = createApp(App);
 app.config.globalProperties.$axios = axios; // Теперь `app` уже объявлен

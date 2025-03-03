@@ -12,6 +12,7 @@
 
 <script>
 import axios from 'axios';
+import VueCookies from 'vue-cookies';
 
 export default {
   data() {
@@ -27,10 +28,15 @@ export default {
   methods: {
     async login() {
       try {
-        const response = await axios.post('/login/', this.form);
+        const response = await axios.post('accs/login/', this.form);
         if (response.status === 201 || response.status === 200) {
           this.message = 'Login successful!';
           this.success = true;
+
+          // Сохраняем токен в куки
+          const token = response.data.token;
+          VueCookies.set('token', token, '1d'); // Токен сохраняется на 1 день
+
           setTimeout(() => {
             this.$router.push('/');
           }, 1000);

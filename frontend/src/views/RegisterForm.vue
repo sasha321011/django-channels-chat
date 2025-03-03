@@ -31,7 +31,7 @@ export default {
   methods: {
     async register() {
       try {
-        const response = await axios.post('/registration/', this.form);
+        const response = await axios.post('accs/registration/', this.form);
         if (response.status === 201 || response.status === 200) {
           this.message = 'Registration successful!';
           this.success = true;
