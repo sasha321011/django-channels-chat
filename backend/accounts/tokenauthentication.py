@@ -5,7 +5,7 @@ from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 from django.conf import settings
 from datetime import datetime, timedelta, timezone
-
+from channels.db import database_sync_to_async
 
 class JWTAuthentication(BaseAuthentication):
     def authenticate(self, request):
@@ -24,7 +24,6 @@ class JWTAuthentication(BaseAuthentication):
             raise AuthenticationFailed('Invalid Token')
 
 
-
     def verify_token(self,payload):
         if 'exp' not in payload:
             raise InvalidTokenError('Token is no available')
@@ -41,6 +40,18 @@ class JWTAuthentication(BaseAuthentication):
             return auth_header.split(' ')[1]
         return None
 
+    @database_sync_to_async
+    def authenticate_websocket(self, scope, token):
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY,
+                                 algorithms=['HS256'])  # Исправлено: algorithms вместо algorithm
+            self.verify_token(payload=payload)
+
+            user_id = payload['id']
+            user = get_user_model().objects.get(id=user_id)
+            return user  # Возвращаем конкретного пользователя, а не модель
+        except (InvalidTokenError, ExpiredSignatureError, get_user_model().DoesNotExist):
+            raise AuthenticationFailed('INVALID TOKEN')
     @staticmethod
     def generate_token(payload):
         expiation = datetime.utcnow() + timedelta(hours=24)

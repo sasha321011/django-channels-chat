@@ -7,7 +7,7 @@ router = DefaultRouter()
 
 
 websocket_urlpatterns = [
-    path('ws/chat/',PersonalChatConsumer.as_asgi()),
+    path('ws/chat/<int:id>/',PersonalChatConsumer.as_asgi()),
 ]
 
 urlpatterns = [

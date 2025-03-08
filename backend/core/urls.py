@@ -21,6 +21,6 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accs/', include("accounts.urls")),
-    path('api/', include("chat.urls")),
+    path('', include("chat.urls")),
     #path('registration',register_user,name='reg')
 ]

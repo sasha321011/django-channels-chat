@@ -77,7 +77,7 @@ TEMPLATES = [
 #WSGI_APPLICATION = 'core.wsgi.application'
 #CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1:8000"]
 ASGI_APPLICATION = 'core.asgi.application'
-CHANNEL_LAYER = {
+CHANNEL_LAYERS = {
     'default':{
         'BACKEND':'channels_redis.core.RedisChannelLayer',
         'CONFIG':{'hosts':[('redis',6379)]}
